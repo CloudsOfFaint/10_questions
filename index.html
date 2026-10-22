@@ -162,8 +162,6 @@
                 <span id="question-number" class="inline-block bg-[#789C4B]/10 text-[#789C4B] text-[11px] font-bold tracking-wider px-3 py-1 rounded-full border border-[#789C4B]/20">
                     QUESTION 01
                 </span>
-                <!-- Hidden timer display element: hidden visually, active functionally -->
-                <span id="timer-display" class="hidden" aria-hidden="true"></span>
             </div>
 
             <!-- Question Text -->
@@ -193,7 +191,7 @@
                 <h2 id="result-title" class="reveal-item text-xl sm:text-2xl font-bold uppercase tracking-wide text-stone-800">
                     <!-- Dominant Trait -->
                 </h2>
-                <!-- Center-Expanding Underline in #789C4B -->
+                <!-- Center-Expanding Underline -->
                 <div id="res-line" class="reveal-line my-3"></div>
             </div>
 
@@ -612,8 +610,6 @@
         let currentIndex = 0;
         let selections = new Array(QUESTIONS.length).fill(null);
         let chartInstance = null;
-        let timerInterval = null;
-        let endTime = 0;
 
         const startScreen = document.getElementById('start-screen');
         const questionScreen = document.getElementById('question-screen');
@@ -658,55 +654,6 @@
                 toElement.classList.remove('view-hidden');
                 toElement.classList.add('view-visible');
             }, 350);
-        }
-
-        function startTimer() {
-            stopTimer();
-            const DURATION_MS = 30000;
-            endTime = Date.now() + DURATION_MS;
-            updateTimerDisplay(DURATION_MS);
-
-            timerInterval = setInterval(() => {
-                const remainingMs = Math.max(0, endTime - Date.now());
-                updateTimerDisplay(remainingMs);
-
-                if (remainingMs <= 0) {
-                    stopTimer();
-                    resetToStart();
-                }
-            }, 10);
-        }
-
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-        }
-
-        function updateTimerDisplay(remainingMs = 30000) {
-            const timerElem = document.getElementById('timer-display');
-            if (timerElem) {
-                const seconds = Math.floor(remainingMs / 1000);
-                const milliseconds = Math.floor((remainingMs % 1000) / 10);
-                const secStr = seconds.toString().padStart(2, '0');
-                const msStr = milliseconds.toString().padStart(2, '0');
-                timerElem.innerHTML = `${secStr}<span class="text-base font-semibold">.${msStr}</span>`;
-            }
-        }
-
-        function resetToStart() {
-            stopTimer();
-            shuffleQuestions();
-            selections = new Array(QUESTIONS.length).fill(null);
-            currentIndex = 0;
-
-            const beginBtn = document.getElementById('begin-btn');
-            if (beginBtn) {
-                beginBtn.innerText = "TRY AGAIN";
-            }
-
-            switchView(questionScreen, startScreen);
         }
 
         function startTest() {
@@ -756,8 +703,6 @@
 
             nextBtn.disabled = selections[currentIndex] === null;
             nextBtn.innerText = currentIndex === QUESTIONS.length - 1 ? "FINISH" : "NEXT";
-
-            startTimer();
         }
 
         function selectOption(clickedBtn, key) {
@@ -825,8 +770,6 @@
         }
 
         function calculateResults() {
-            stopTimer();
-
             const scores = { _0x1: 0, _0x2: 0, _0x3: 0, _0x4: 0, _0x5: 0 };
             selections.forEach(key => {
                 if (key && scores.hasOwnProperty(key)) {
